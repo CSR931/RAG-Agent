@@ -1,0 +1,31 @@
+# 基础工具
+pyyaml>=6.0
+python-dotenv>=1.0
+pydantic>=2.0
+fastapi>=0.100
+uvicorn>=0.23
+httpx>=0.26
+
+# 深度学习框架（GPU 版请单独安装，这里仅保证 CPU 兼容）
+torch>=2.0.0
+torchvision>=0.16.0
+
+# 嵌入与检索
+sentence-transformers>=2.2
+faiss-cpu>=1.7
+rank-bm25>=0.2
+
+# 文档加载
+pypdf>=3.17
+markdown>=3.5
+
+# 大模型调用
+openai>=1.0
+
+# 评测
+ragas>=0.1
+datasets>=2.18
+pytest>=8.0
+
+# 其他
+numpy>=1.24
