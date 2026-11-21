@@ -84,33 +84,45 @@ Promt模板————规定了大模型该怎么说话、用什么格式输出
 ## 具体实现
 ### 项目结构
 ```
-ragent-bench/
-├── README.md
-├── requirements.txt
-├── .env.example
-├── .gitignore
-├── data/
-│   └── docs/          # 先放 3 篇小文档
-├── src/
-│   ├── __init__.py
-│   ├── config.py
-│   ├── ingestion/
-│   │   ├── __init__.py
-│   │   ├── loader.py
-│   │   └── splitter.py        # 分片
-│   ├── retrieval/
-│   │   ├── __init__.py
-│   │   ├── embedder.py        # 索引
-│   │   └── faiss_store.py     # 索引+召回
-│   └── agent/
-│       ├── __init__.py
-│       ├── llm_client.py
-│       ├── tools.py
-│       ├── prompts.py         # 生成
-│       └── react_agent.py     # 生成
-└── scripts/
-    ├── ingest.py
-    └── demo_chat.py
+RAG-Agent/
+├── .env                      # 环境变量（OLLAMA_MODELS路径、API_KEY等）
+├── requirements.txt 
+├── README.md                 
+│
+├── data/                      
+│   ├── docs/                  
+│   └── index/                 
+│       ├── idx.faiss          # FAISS 向量索引
+│       ├── idx.docs           # 原文片段映射
+│       └── bm25.pkl           # BM25 关键词索引
+│
+├── scripts/                   
+│   ├── ingest.py              # 离线建库脚本（切分 ➡️ 向量化 ➡️ 存索引）
+│   └── demo_chat.py           # 对话启动入口
+│
+├── src/                        
+│   ├── ingestion/             
+│   │   ├── loader.py          
+│   │   └── splitter.py        
+│   │
+│   ├── retrieval/             
+│   │   ├── embedder.py        # 嵌入模型（粗筛用）
+│   │   ├── faiss_store.py     
+│   │   ├── bm25.py            
+│   │   ├── hybrid.py          # RRF 融合算法
+│   │   └── reranker.py        # 精排模块（Cross-Encoder）
+│   │
+│   ├── agent/                 
+│   │   ├── react_agent.py     # ReAct 循环主逻辑（思考-行动-观察）
+│   │   ├── llm-client.py      # LLM 客户端（Ollama/API 调用封装）
+│   │   ├── tools.py           # 工具定义（包含 rag_search 等）
+│   │   └── prompts.py         # 提示词模板
+│   │
+│   └── config/
+│
+└── tests/                      
+    ├── test_retrieval.py      
+    └── eval_rag.py             # RAGAS 评测脚本
 ```
 ### 详细说明
 一、分片（Chunking）
@@ -255,5 +267,14 @@ ReActAgent.run()
 ```
 
 ### Step1 建立索引如图
+稠密索引
 
 <img width="456" height="118" alt="屏幕截图 2026-11-10 212628" src="https://github.com/user-attachments/assets/b20b8cd1-2489-40f3-85ad-d681dce7b612" />
+
+混合索引
+
+<img width="626" height="156" alt="屏幕截图 2026-11-21 162659" src="https://github.com/user-attachments/assets/15b9c0f1-4b58-40ea-a53d-31048a744c30" />
+
+### step2 问答示例
+<img width="747" height="617" alt="屏幕截图 2026-11-21 163320" src="https://github.com/user-attachments/assets/eecad116-bef3-4064-98f2-f15a70df5f4b" />（本地部署模型qwen3.5:4b）
+
